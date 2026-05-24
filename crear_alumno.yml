@@ -1,0 +1,16 @@
+---
+  - name: Crear usuario alumno y estructura DAM1
+    hosts: DAM1
+    user: root
+
+    tasks:
+
+      - name: Copiar script
+        copy:
+          src: /home/server/crear_alumno.sh
+          dest: /crear_alumno.sh
+          mode: '0755'
+
+
+      - name: Ejecutar script
+        command: /crear_alumno.sh

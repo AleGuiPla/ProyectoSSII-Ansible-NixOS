@@ -1,0 +1,33 @@
+---
+- name: Cambiar fondo de alumnos
+  hosts: DAM1
+  become: yes
+  user: root
+
+  vars:
+    fondo_local: fondo.jpg
+    fondo_remoto: /usr/share/backgrounds/fondo.jpg
+    usuario: alumno
+
+  tasks:
+
+    - name: Copiar imagen al equipo remoto
+      copy:
+        src: "{{ fondo_local }}"
+        dest: "{{ fondo_remoto }}"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Obtener UID
+      command: id -u "{{ usuario }}"
+      register: uid_usuario
+
+    - name: Configurar fondo de pantalla
+      become_user: "{{ usuario }}"
+      environment:
+        DISPLAY: ":0"
+        DBUS_SESSIOS_BUS_ADDRESS: "unix:path=/run/user/{{ uid_usuario.stdout }}/bus"
+        XDG_RUNTIME_DIR: "/run/user/{{ uid_usuario.stdout }}"
+      shell: |
+        gsettings set org.cinnamon.desktop.background picture-uri "file://{{ fondo_remoto }}"

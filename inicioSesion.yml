@@ -1,0 +1,42 @@
+---
+- name: Inicio de sesión en alumno
+  hosts: DAM1
+  become: yes
+  user: root
+
+  vars:
+    usuario: alumno
+
+
+  tasks:
+
+    - name: Directorio de configuracion autologin
+      file:
+        path: /etc/lightdm/lightdm.conf.d
+        state: directory
+        mode: '0755'
+
+    - name: Activar autologin
+      copy:
+        dest: /etc/lightdm/lightdm.conf.d/99-autologin.conf
+        content: |
+          [Seat:*]
+          autologin-user={{ usuario }}
+          autologin-user-timeout=0
+          user-session=cinnamon
+          greeter-hide-users=false
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Desactivar login anterior
+      lineinfile:
+        path: /etc/lightdm/lightdm.conf.d/70-linuxmint.conf
+        regexp: '^greeter-show-manual-login='
+        line: 'greeter-show-manual-login=true'
+        create: yes
+
+    - name: Reiniciar
+      service:
+        name: lightdm
+        state: restarted

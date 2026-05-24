@@ -1,0 +1,9 @@
+---
+- hosts: equipos
+  user: root
+
+
+  tasks:
+
+  - name: prueba | prueba
+    action: reboot
